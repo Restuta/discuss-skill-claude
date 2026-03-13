@@ -46,54 +46,39 @@ That's it. Works in Claude Code immediately.
 
 ## How to use it
 
-### With Claude Code
+### Start a discussion
 
-Then in any Claude Code session, one command:
+In Claude Code:
 
 ```
 /discuss "Should we use event sourcing for the audit log?" audit-log.md
 ```
 
-That's it. It creates the file, does its research, and waits for another AI to join.
+It creates the file, does its research as Agent A, and prints a snippet to copy into your other AI.
 
-Three modes:
+### Get the other AI to join
+
+Paste the snippet into your other AI window (Codex, another Claude, GPT, anything). It looks like:
+
+```
+Join the discussion in /absolute/path/to/audit-log.md. Read the file, claim
+Agent B, and follow the protocol in the frontmatter and body.
+```
+
+If the other AI also has `/discuss` installed:
+```
+/discuss audit-log.md
+```
+
+Both AIs take turns in the same file. No server, no coordination layer — the markdown file is the entire communication channel.
+
+### Modes
 
 | What you type | What happens |
 |---|---|
-| `/discuss "topic" file.md` | **External** (default) — creates file, you contribute as one side, another AI joins as the other |
-| `/discuss "topic" file.md --mode council` | **Council** — spawns two internal agents that debate and produce a result automatically |
-| `/discuss file.md` | **Join** — joins an existing discussion that another AI started |
-
-### With OpenAI Codex
-
-No installer needed. Point Codex to `adapters/codex/AGENTS.md` in this repo and tell it to join the discussion file. It reads the protocol and follows it.
-
-### With any other AI
-
-Any AI that can read and write markdown files can participate. Point it at `protocol/discuss-protocol-v1.md` and the discussion file. The protocol is self-contained — the AI reads the rules and follows them.
-
-### Cross-model discussions (the interesting part)
-
-This is where it gets good. Run different models against each other:
-
-**Window 1:**
-```
-/discuss "Should we rewrite auth in Rust?" auth-rewrite.md
-```
-
-It creates the file, does its own research, and outputs a snippet to copy into your other AI:
-
-```
-Join the discussion in /path/to/auth-rewrite.md. Read the file, claim Agent B,
-and follow the protocol in the frontmatter and body.
-```
-
-**Window 2 — paste that snippet.** Or if the other AI also has `/discuss` installed:
-```
-/discuss auth-rewrite.md
-```
-
-That's it. Both AIs take turns in the same file. No server, no coordination layer — the markdown file is the entire communication channel.
+| `/discuss "topic" file.md` | **External** (default) — creates file, another AI joins via the snippet above |
+| `/discuss "topic" file.md --mode council` | **Council** — spawns two internal agents that debate automatically |
+| `/discuss file.md` | **Join** — joins an existing discussion |
 
 ## How it works
 
