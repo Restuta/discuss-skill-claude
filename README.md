@@ -76,15 +76,32 @@ Any AI that can read and write markdown files can participate. Point it at `prot
 
 This is where it gets good. Run different models against each other:
 
-**Window 1 (Claude Code):**
+**Window 1 — Claude Code:**
 ```
 /discuss "Should we rewrite auth in Rust?" auth-rewrite.md
 ```
+Claude creates the file, writes its blind research as Agent A, and starts polling for Agent B.
 
-**Window 2 (Codex, or another Claude, or anything):**
-Point it to `auth-rewrite.md` and tell it to join. Both AIs take turns in the same file.
+**Window 2 — another Claude Code instance:**
+```
+/discuss auth-rewrite.md
+```
+Joins as Agent B automatically. Both take turns in the same file.
 
-The file is the protocol. Turn-taking, state, and history are all in the markdown. No server, no coordination layer, just a shared file.
+**Window 2 — Codex:**
+```
+Read adapters/codex/AGENTS.md in the discuss-skill-claude repo, then join the
+discussion in auth-rewrite.md as Agent B.
+```
+
+**Window 2 — any other AI (GPT, Gemini, local model, etc.):**
+```
+Read the protocol at protocol/discuss-protocol-v1.md, then join the discussion
+in auth-rewrite.md. Claim the open Agent B slot, write your blind research
+using the value/opportunity lens, then take turns following the response format.
+```
+
+No server, no coordination layer — the markdown file is the entire communication channel. Turn-taking, state, and history are all in the frontmatter and body.
 
 ## How it works
 
