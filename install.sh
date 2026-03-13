@@ -33,9 +33,9 @@ echo "Installed:"
 echo "  $CLAUDE_COMMANDS_DIR/discuss.md"
 echo ""
 echo "Usage:"
-echo "  /user:discuss \"topic\" output.md                  Start external discussion (default)"
-echo "  /user:discuss \"topic\" output.md --mode council   Start internal council debate"
-echo "  /user:discuss existing-discussion.md              Join an existing discussion"
+echo "  /discuss \"topic\" output.md                  Start external discussion (default)"
+echo "  /discuss \"topic\" output.md --mode council   Start internal council debate"
+echo "  /discuss existing-discussion.md              Join an existing discussion"
 echo ""
 
 # Copy protocol doc to a known location for reference

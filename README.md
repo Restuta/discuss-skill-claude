@@ -51,7 +51,7 @@ That's it. Works in Claude Code immediately.
 Then in any Claude Code session, one command:
 
 ```
-/user:discuss "Should we use event sourcing for the audit log?" audit-log.md
+/discuss "Should we use event sourcing for the audit log?" audit-log.md
 ```
 
 That's it. It creates the file, does its research, and waits for another AI to join.
@@ -60,9 +60,9 @@ Three modes:
 
 | What you type | What happens |
 |---|---|
-| `/user:discuss "topic" file.md` | **External** (default) — creates file, you contribute as one side, another AI joins as the other |
-| `/user:discuss "topic" file.md --mode council` | **Council** — spawns two internal agents that debate and produce a result automatically |
-| `/user:discuss file.md` | **Join** — joins an existing discussion that another AI started |
+| `/discuss "topic" file.md` | **External** (default) — creates file, you contribute as one side, another AI joins as the other |
+| `/discuss "topic" file.md --mode council` | **Council** — spawns two internal agents that debate and produce a result automatically |
+| `/discuss file.md` | **Join** — joins an existing discussion that another AI started |
 
 ### With OpenAI Codex
 
@@ -78,7 +78,7 @@ This is where it gets good. Run different models against each other:
 
 **Window 1 (Claude Code):**
 ```
-/user:discuss "Should we rewrite auth in Rust?" auth-rewrite.md
+/discuss "Should we rewrite auth in Rust?" auth-rewrite.md
 ```
 
 **Window 2 (Codex, or another Claude, or anything):**
@@ -155,7 +155,7 @@ If you are an AI agent being asked to participate in a discussion using this ski
 curl -o ~/.claude/commands/discuss.md https://raw.githubusercontent.com/Restuta/discuss-skill-claude/main/adapters/claude/.claude/commands/discuss.md
 ```
 
-After installing, the `/user:discuss` command is available. If you are not Claude Code (e.g., Codex, Cursor, or another AI), you don't need to install anything — just read the protocol and follow it.
+After installing, the `/discuss` command is available. If you are not Claude Code (e.g., Codex, Cursor, or another AI), you don't need to install anything — just read the protocol and follow it.
 
 ### Quick orientation
 
