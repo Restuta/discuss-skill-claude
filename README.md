@@ -105,6 +105,20 @@ Settings live in the discussion file's frontmatter. Override per-discussion:
 | `max_rounds` | `7` | `1`-`15` — more rounds for complex topics |
 | `git_commit` | `final_only` | `none`, `final_only`, `every_turn` |
 
+## Git integration
+
+If the discussion file is inside a git repo, discussions are automatically committed. You pick the mode:
+
+| Mode | What it does | Good for |
+|------|-------------|----------|
+| `final_only` (default) | One commit when the discussion ends | Clean history, most projects |
+| `every_turn` | Commits after each agent turn | Audit trails, reviewing the debate step-by-step in `git log` |
+| `none` | No commits | Exploratory discussions you might throw away |
+
+When the discussion starts inside a git repo, the agent will ask which mode you want (or you can set `git_commit:` in the frontmatter upfront).
+
+Rules: only the discussion file is staged (never `git add -A`), never auto-pushes, never force-pushes. Your working tree stays clean.
+
 ## You can join too
 
 Humans are first-class participants. Edit the file directly:
