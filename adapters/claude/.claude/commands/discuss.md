@@ -15,12 +15,17 @@ When invoked, print this to the user so they know what's happening:
 **For external mode:**
 > Starting external discussion on: "<topic>"
 > Created: file.md
-> Mode: external — waiting for another AI to join
+> Mode: external — doing independent research, waiting for another AI to join
 >
-> Next steps:
-> 1. Open another AI (Codex, another Claude window, etc.)
-> 2. Point it to file.md and tell it to join the discussion
-> 3. This session will watch for changes and take turns automatically
+> **Copy this into your other AI to join:**
+> ```
+> Join the discussion in <absolute path to file.md>. Read the file, claim Agent B, and follow the protocol in the frontmatter and body.
+> ```
+>
+> If the other AI has `/discuss` installed:
+> ```
+> /discuss <absolute path to file.md>
+> ```
 
 **For council mode:**
 > Starting council discussion on: "<topic>"
