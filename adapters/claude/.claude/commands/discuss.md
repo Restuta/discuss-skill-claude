@@ -213,10 +213,10 @@ After both return:
 
 Loop until consensus or `round > max_rounds`:
 
-**Agent A's turn:** Resume Agent A with full file + turn instructions (see Turn Structure below).
+**Agent A's turn:** Resume Agent A with the full discussion file content and the Turn Structure section (below) included verbatim in the prompt. The agent must know the exact response format and heading structure.
 After return: append, update `turn: B`, git commit if `every_turn`.
 
-**Agent B's turn:** Resume Agent B with full file + turn instructions.
+**Agent B's turn:** Resume Agent B with the full discussion file content and the Turn Structure section included verbatim.
 After return: append, update `turn: A`, increment `round`, git commit if `every_turn`.
 
 **Convergence check (round 3+):**
