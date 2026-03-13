@@ -60,12 +60,19 @@ last_updated: 2026-03-13T10:15:00Z
 
 **Defaults:** if a field is omitted from frontmatter, use its documented default. Fields are not required to be explicitly present.
 
+Keep frontmatter minimal. Do not turn the discussion file into a database.
+
 ### 2.2 Body Structure
 
 The body follows this order. All sections are append-only — never delete or rewrite earlier content.
 
 ```markdown
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 
 ## Research Phase
 <!-- Only present if blind_briefs: true -->
@@ -316,6 +323,8 @@ Before writing, every participant MUST:
 2. Confirm `turn:` still indicates them
 3. Confirm the file hasn't changed since their last read
 4. If anything changed: abort, re-read, reassess whether it's still their turn
+
+Fail closed. Do not guess.
 
 No lock file in v1. Turn-based human-timescale workflows make sub-second collisions extremely unlikely.
 

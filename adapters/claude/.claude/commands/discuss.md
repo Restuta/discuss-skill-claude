@@ -80,7 +80,14 @@ last_updated: <ISO 8601 timestamp>
 ---
 
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 ```
+
+The agent MUST generate the Key Questions from the topic when creating a new discussion. These should be concrete sub-questions that, if answered, would resolve the topic.
 
 ### Git Detection
 
@@ -153,6 +160,11 @@ last_updated: <ISO 8601 timestamp>
 ---
 
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 ```
 
 ### Phase 1: Blind Research
@@ -336,5 +348,7 @@ Before EVERY write:
 2. Confirm `turn` still indicates you
 3. Confirm no new content since last read
 4. If anything changed: abort, re-read, reassess
+
+Fail closed. Do not guess.
 
 This prevents collisions without a lock file.
