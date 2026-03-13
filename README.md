@@ -8,7 +8,7 @@ The output is a single markdown file you can read, share, or commit to your repo
 
 ## What it looks like
 
-Here's the end of a real discussion — the part you actually read:
+Here's the end of a real discussion about "Should we use event sourcing for the audit log?" — the part you actually read:
 
 ```markdown
 ## Consensus Summary

@@ -4,7 +4,16 @@ This is the canonical protocol for multi-AI structured discussions. All adapters
 
 ## 1. Overview
 
-A discussion is a turn-based, append-only exchange between two or more participants (AI agents and/or humans) in a single markdown file. The goal is to reach the best answer through structured disagreement, evidence, and synthesis — not to agree quickly.
+A discussion is a turn-based, append-only exchange between two participants (AI agents and/or humans) in a single markdown file. The goal is to reach the best answer through structured disagreement, evidence, and synthesis — not to agree quickly.
+
+### 1.1 Modes
+
+| Mode | Description | How it works |
+|------|-------------|--------------|
+| `external` (default) | Two different AIs discuss in a shared file | Each AI takes turns appending to the same file |
+| `council` | One AI spawns two internal subagents | Orchestrator manages both agents, writes to one file |
+
+The `mode` field in frontmatter records which mode is active. The protocol rules are the same for both — the difference is only in how participants are managed (externally by separate AI instances, or internally by an orchestrator).
 
 ## 2. Discussion File Format
 
@@ -16,6 +25,7 @@ Every discussion lives in one `.md` file. The file has two logical parts: YAML f
 ---
 # Setup (immutable after init)
 topic: "Should we use event sourcing for the audit log?"
+mode: external
 blind_briefs: true
 max_rounds: 7
 git_commit: final_only
@@ -25,9 +35,9 @@ agent_a_lens: "risk/cost/failure"
 agent_b_lens: "value/opportunity/success"
 
 # State (updated each turn)
-status: discussing
+status: researching
 turn: A
-round: 2
+round: 0
 created: 2026-03-13T10:00:00Z
 last_updated: 2026-03-13T10:15:00Z
 ---
@@ -35,6 +45,7 @@ last_updated: 2026-03-13T10:15:00Z
 
 **Setup fields** are set at creation and never modified:
 - `topic` (required): the question being discussed
+- `mode` (default `external`): `external | council`
 - `blind_briefs` (default `true`): whether agents research independently before debate
 - `max_rounds` (default `7`, range 1-15): discussion rounds before forced synthesis
 - `git_commit` (default `final_only`): `none | final_only | every_turn`
@@ -42,10 +53,12 @@ last_updated: 2026-03-13T10:15:00Z
 - `agent_a_lens`, `agent_b_lens`: analytical perspectives assigned to each agent
 
 **State fields** are updated each turn:
-- `status`: `setup | researching | discussing | consensus | deadlock`
+- `status`: `researching | discussing | consensus | deadlock`
 - `turn`: `A | B | human` — who writes next
-- `round`: current discussion round number (starts at 1 after research)
+- `round`: current discussion round number. `0` during research phase, `1`+ during discussion.
 - `created`, `last_updated`: ISO 8601 timestamps
+
+**Defaults:** if a field is omitted from frontmatter, use its documented default. Fields are not required to be explicitly present.
 
 ### 2.2 Body Structure
 
@@ -57,10 +70,10 @@ The body follows this order. All sections are append-only — never delete or re
 ## Research Phase
 <!-- Only present if blind_briefs: true -->
 
-### Agent A — Independent Research
+### Agent A — Independent Research | research
 ...
 
-### Agent B — Independent Research
+### Agent B — Independent Research | research
 ...
 
 ---
@@ -99,11 +112,14 @@ The entry type appears in the heading line. The content within the entry carries
 
 ### 3.1 Entry Heading Format
 
+The general pattern:
+
 ```markdown
 ### Round N — ParticipantName | type | confidence: X%
 ```
 
-Examples:
+Variations by entry type:
+
 ```markdown
 ### Agent A — Independent Research | research
 ### Round 1 — Claude | response | confidence: 75%
@@ -111,9 +127,28 @@ Examples:
 ### Human Interjection | human-note
 ```
 
-Entry ordering in the file determines sequence. No `entry_id`, `responds_to`, or `seen_latest_entry` fields needed — sequence is implicit in an append-only log.
+Notes:
+- `research` entries use the agent slot name (Agent A/B) and have no round number or confidence — they precede the discussion.
+- `human-note` entries have no round number or confidence — humans interject freely.
+- `response` and `consensus` entries use the participant's name from `agent_a`/`agent_b` frontmatter and include round number and confidence.
+- Entry ordering in the file determines sequence. No `entry_id`, `responds_to`, or `seen_latest_entry` fields needed — sequence is implicit in an append-only log.
 
-### 3.2 Response Entry Body Structure
+### 3.2 Research Entry Body Structure
+
+Each research entry should include:
+
+```markdown
+[Analysis through the assigned lens. Be specific, cite evidence where
+possible, name uncertainties.]
+
+**Key uncertainty:** [What you're least sure about]
+
+**Confidence:** [X% — brief justification]
+```
+
+Research entries are free-form analysis, not structured debate. There is no required sub-section format beyond being substantive and lens-appropriate.
+
+### 3.3 Response Entry Body Structure
 
 Each AI response turn MUST include these sections:
 
@@ -134,7 +169,14 @@ Must reflect any updates from this round.
 One specific question that would most help resolve remaining disagreement.
 ```
 
-### 3.3 Consensus Entry Body Structure
+**Convergence assessment (round 3+):** After the question, append one of these labels with specifics:
+
+- `CONVERGING` — positions within ~80% agreement, name the remaining gap
+- `PARALLEL` — same conclusion, different reasoning, document both rationales
+- `DIVERGING` — core disagreement on specific point, state what would change your mind
+- `DEADLOCKED` — after multiple rounds, fundamental disagreement, recommend human review
+
+### 3.4 Consensus Entry Body Structure
 
 ```markdown
 ### Decision
@@ -156,14 +198,13 @@ One specific question that would most help resolve remaining disagreement.
 
 ## 4. Discussion Phases
 
-### 4.1 Phase 0: Setup
+### 4.1 Setup
 
 1. Create the discussion file with frontmatter and empty body structure
-2. Set `status: setup`
-3. If `blind_briefs: true`, set `status: researching`
-4. If `blind_briefs: false`, set `status: discussing`, `round: 1`, `turn: A`
+2. If `blind_briefs: true`, set `status: researching`, `round: 0`, `turn: A`
+3. If `blind_briefs: false`, set `status: discussing`, `round: 1`, `turn: A`
 
-### 4.2 Phase 1: Blind Research (optional, default on)
+### 4.2 Blind Research (optional, default on)
 
 Each agent independently researches the topic before seeing the other's work.
 
@@ -175,7 +216,7 @@ Rules:
   - Agent B: "Focus on benefits, opportunities, success cases, and what could go right"
 - After both research entries are written, set `status: discussing`, `round: 1`, `turn: A`
 
-### 4.3 Phase 2: Discussion Rounds
+### 4.3 Discussion Rounds
 
 Agents alternate turns responding to each other.
 
@@ -183,33 +224,37 @@ Turn order: `A → B → A → B → ...`
 
 Each turn:
 1. Agent reads the full discussion file
-2. Agent writes a structured response (see 3.2)
+2. Agent writes a structured response (see 3.3)
 3. Update `turn` to next participant
-4. If both agents have gone, increment `round`
-5. Update `last_updated`
+4. Update `last_updated`
 
-**Convergence check (round 3+):** After each turn, the agent assesses convergence:
-- `CONVERGING` — positions within ~80% agreement, name the remaining gap
-- `PARALLEL` — same conclusion, different reasoning, document both
-- `DIVERGING` — core disagreement on specific point, state what would change your mind
-- `DEADLOCKED` — after multiple rounds, fundamental disagreement, recommend human review
+**Round counting:** Agent B's turn completes a round. After Agent B writes, increment `round`. So during Round 1: Agent A writes (round stays 1), Agent B writes (round increments to 2). The `round` frontmatter always reflects the *next* round to be played.
 
-### 4.4 Phase 3: Forced Synthesis
+**Convergence triggers (round 3+):**
+- If the latest assessment is `CONVERGING` or `PARALLEL`, the agent MAY write a `consensus` entry instead of continuing with responses. This is optional — discussion can continue if the agent believes more refinement is needed.
+- If the latest assessment is `DEADLOCKED`, the agent SHOULD write a `consensus` entry declaring deadlock.
+- `DIVERGING` means continue to the next round.
 
-When `round` exceeds `max_rounds`, the next turn MUST be a `consensus` entry. The agent must either:
+### 4.4 Forced Synthesis
+
+When `round` exceeds `max_rounds`, the next turn MUST be a `consensus` entry, written by whichever agent's turn it is. The agent must either:
 1. Propose a joint summary (if converging)
 2. Declare deadlock with clear articulation of the remaining crux (if diverging)
 
 Set `status: consensus` or `status: deadlock`.
 
+In council mode, the orchestrator may write the consensus entry instead of delegating to a subagent.
+
 ### 4.5 Human Intervention
 
 At any point, a human can:
-- Add a `### Human Interjection | human-note` entry
+- Add a `### Human Interjection | human-note` entry anywhere in the file
 - Set `turn: human` in frontmatter, write their entry, then set `turn` to the next agent
-- In orchestrated mode: simply edit the file; the orchestrator will detect the new content
+- In council mode: simply edit the file; the orchestrator will detect the new content
 
 Humans can: add constraints, inject missing context, ask questions, break ties, redirect the discussion, or force early consensus.
+
+When a participant detects a `human-note` entry that wasn't present in their last read, they should acknowledge and address it in their next turn.
 
 ## 5. Master Prompt
 
@@ -274,14 +319,14 @@ Before writing, every participant MUST:
 
 No lock file in v1. Turn-based human-timescale workflows make sub-second collisions extremely unlikely.
 
-### 6.3 Identity Assignment (Collaborative Mode)
+### 6.3 Identity Assignment (External Mode)
 
-When a participant joins a discussion:
+When a participant joins a discussion in external mode:
 1. Read the file
-2. If `agent_a` is unassigned: claim it
-3. Else if `agent_b` is unassigned: claim it
+2. If `agent_a` is "unassigned" or empty: claim it, update frontmatter
+3. Else if `agent_b` is "unassigned" or empty: claim it, update frontmatter
 4. Else: join as observer (can only write `human-note` entries)
-5. After claiming, re-read to confirm no collision
+5. After claiming, re-read to confirm no collision. If both claimed the same slot, the later timestamp yields.
 
 ## 7. Git Integration
 
@@ -359,13 +404,14 @@ If an agent writes a malformed entry (wrong heading format, missing sections):
 ### 10.2 Stale Discussion
 
 If no new entry has been appended for an extended period:
-- In orchestrated mode: the orchestrator should detect this and prompt the user
-- In collaborative mode: participants should check `last_updated` and alert the user if stale
+- In council mode: the orchestrator should detect this and prompt the user
+- In external mode: participants should check `last_updated` and alert the user if stale
 
 ### 10.3 Exceeded Max Rounds
 
 If `round` exceeds `max_rounds`:
 - The next entry MUST be type `consensus`
+- The agent whose turn it is writes the consensus entry
 - The agent must synthesize or declare deadlock
 - No further `response` entries are permitted
 
@@ -377,7 +423,7 @@ An adapter must:
 3. Append entries in the correct structure
 4. Update frontmatter state fields correctly
 5. Implement the master prompt (section 5) without altering its meaning
-6. Support both orchestrated and collaborative modes (or clearly document which mode is supported)
+6. Support external mode, council mode, or both (clearly document which)
 
 An adapter must NOT:
 - Own consensus rules, entry schema, or prompt logic

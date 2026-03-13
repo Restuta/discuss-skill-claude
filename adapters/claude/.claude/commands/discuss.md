@@ -88,6 +88,8 @@ If the file is inside a git repository, ask the user:
 
 ### Research Phase
 
+If `blind_briefs: true` (default):
+
 Write your blind research immediately using Agent A's lens (risks, costs, failure modes):
 
 ```markdown
@@ -100,14 +102,20 @@ Write your blind research immediately using Agent A's lens (risks, costs, failur
 
 Update `turn: B` and tell the user you're waiting for the other AI.
 
+If `blind_briefs: false`:
+
+Skip the research phase. Set `status: discussing`, `round: 1`, `turn: A`. Write your first response directly under `## Discussion`.
+
 ### Discussion Phase
 
 Poll the file for changes (every ~10 seconds):
 1. Re-read the file
 2. If new content appeared and `turn` indicates you → write your response
-3. If `turn` is not you → keep waiting
-4. After 5 minutes of no changes → tell the user the discussion appears stalled
-5. If `status: consensus` or `status: deadlock` → display summary, stop
+3. If a `### Human Interjection | human-note` entry appeared since your last read → acknowledge and address it in your next response
+4. If `turn` is not you → keep waiting
+5. After 5 minutes of no changes → tell the user the discussion appears stalled
+6. If `status: consensus` or `status: deadlock` → display summary, stop
+7. If `round > max_rounds` → write a consensus entry instead of a response
 
 For each response turn, follow the **Turn Structure** below.
 
@@ -144,7 +152,9 @@ last_updated: <ISO 8601 timestamp>
 
 ### Phase 1: Blind Research
 
-Spawn **two agents in parallel**:
+If `blind_briefs: false`, skip this phase entirely. Set `status: discussing`, `round: 1`, `turn: A` and proceed to Phase 2.
+
+If `blind_briefs: true` (default), spawn **two agents in parallel**:
 
 **Agent A prompt:**
 ```
@@ -191,13 +201,16 @@ After return: append, update `turn: B`, git commit if `every_turn`.
 After return: append, update `turn: A`, increment `round`, git commit if `every_turn`.
 
 **Convergence check (round 3+):**
-- Both say CONVERGING → Phase 3
-- Either says DEADLOCKED → Phase 3 (deadlock)
-- Otherwise → next round
+- Latest assessment is `CONVERGING` or `PARALLEL` → the responding agent MAY write a consensus entry (optional — continue if more refinement is needed)
+- Latest assessment is `DEADLOCKED` → Phase 3 (deadlock)
+- Latest assessment is `DIVERGING` → next round
+- If `round > max_rounds` → Phase 3 (forced synthesis)
 
 ### Phase 3: Consensus Summary
 
-Write the consensus (see Consensus Format below). Update `status`. Git commit. Print summary to terminal.
+The agent whose turn it is writes the consensus entry (see Consensus Format below). In council mode, the orchestrator may write it directly instead of delegating.
+
+Update `status: consensus` (or `status: deadlock`). Git commit if configured. Print summary to terminal.
 
 ---
 
