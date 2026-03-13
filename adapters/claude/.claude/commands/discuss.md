@@ -80,7 +80,14 @@ last_updated: <ISO 8601 timestamp>
 ---
 
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 ```
+
+The agent MUST generate the Key Questions from the topic when creating a new discussion. These should be concrete sub-questions that, if answered, would resolve the topic.
 
 ### Git Detection
 
@@ -153,7 +160,14 @@ last_updated: <ISO 8601 timestamp>
 ---
 
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 ```
+
+The orchestrator MUST generate the Key Questions from the topic when creating the discussion file.
 
 ### Phase 1: Blind Research
 
@@ -199,10 +213,10 @@ After both return:
 
 Loop until consensus or `round > max_rounds`:
 
-**Agent A's turn:** Resume Agent A with full file + turn instructions (see Turn Structure below).
+**Agent A's turn:** Resume Agent A with the full discussion file content and the Turn Structure section (below) included verbatim in the prompt. The agent must know the exact response format and heading structure.
 After return: append, update `turn: B`, git commit if `every_turn`.
 
-**Agent B's turn:** Resume Agent B with full file + turn instructions.
+**Agent B's turn:** Resume Agent B with the full discussion file content and the Turn Structure section included verbatim.
 After return: append, update `turn: A`, increment `round`, git commit if `every_turn`.
 
 **Convergence check (round 3+):**
@@ -336,5 +350,7 @@ Before EVERY write:
 2. Confirm `turn` still indicates you
 3. Confirm no new content since last read
 4. If anything changed: abort, re-read, reassess
+
+Fail closed. Do not guess.
 
 This prevents collisions without a lock file.

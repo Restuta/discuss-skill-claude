@@ -142,6 +142,8 @@ Multi-agent debate is not just a vibe — there's real research showing it impro
 
 **Caveat:** A [2025 ICLR analysis](https://d2jud02ci9yv69.cloudfront.net/2025-04-28-mad-159/blog/mad/) noted that multi-agent debate doesn't consistently outperform simpler methods like chain-of-thought on all benchmarks. The benefits are most pronounced on tasks requiring diverse perspectives, factual verification, and structured reasoning — which is exactly what this tool targets.
 
+For longer notes and additional sources, see [docs/research.md](docs/research.md).
+
 ## Project structure
 
 ```
@@ -153,6 +155,10 @@ discuss-skill-claude/
 │   │   └── discuss.md             # Claude Code skill (all modes)
 │   └── codex/
 │       └── AGENTS.md              # Codex instruction file
+├── templates/
+│   └── discussion-template.md     # Standalone template for reference
+├── docs/
+│   └── research.md                # Research citations & longer notes
 ├── examples/
 │   ├── full-discussion.md         # Complete consensus example
 │   └── deadlock-example.md        # Productive deadlock example

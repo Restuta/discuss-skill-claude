@@ -49,8 +49,10 @@ last_updated: 2026-03-13T10:15:00Z
 - `blind_briefs` (default `true`): whether agents research independently before debate
 - `max_rounds` (default `7`, range 1-15): discussion rounds before forced synthesis
 - `git_commit` (default `final_only`): `none | final_only | every_turn`
-- `agent_a`, `agent_b`: participant names/identifiers
 - `agent_a_lens`, `agent_b_lens`: analytical perspectives assigned to each agent
+
+**Claim-once fields** may be written once when a participant joins, then never modified:
+- `agent_a`, `agent_b`: participant names/identifiers. The initiator sets `agent_a` to their own name at creation. In external mode, `agent_b` starts as `"unassigned"` and is claimed by the joining participant (see 6.3). In council mode, the orchestrator sets both at creation.
 
 **State fields** are updated each turn:
 - `status`: `researching | discussing | consensus | deadlock`
@@ -60,12 +62,19 @@ last_updated: 2026-03-13T10:15:00Z
 
 **Defaults:** if a field is omitted from frontmatter, use its documented default. Fields are not required to be explicitly present.
 
+Keep frontmatter minimal. Do not turn the discussion file into a database.
+
 ### 2.2 Body Structure
 
 The body follows this order. All sections are append-only — never delete or rewrite earlier content.
 
 ```markdown
 # Discussion: <topic>
+
+## Key Questions
+1. [Generated from the topic — 2-3 specific sub-questions to resolve]
+2. ...
+3. ...
 
 ## Research Phase
 <!-- Only present if blind_briefs: true -->
@@ -317,6 +326,8 @@ Before writing, every participant MUST:
 3. Confirm the file hasn't changed since their last read
 4. If anything changed: abort, re-read, reassess whether it's still their turn
 
+Fail closed. Do not guess.
+
 No lock file in v1. Turn-based human-timescale workflows make sub-second collisions extremely unlikely.
 
 ### 6.3 Identity Assignment (External Mode)
@@ -372,7 +383,7 @@ The discussion file is strictly append-only:
 
 1. Never delete earlier entries
 2. Never rewrite earlier entries
-3. Never mutate frontmatter setup fields after init
+3. Never mutate frontmatter setup fields after init (claim-once fields may be written once; see 2.1)
 4. Frontmatter state fields (`status`, `turn`, `round`, `last_updated`) are the ONLY mutable parts of the file
 5. The consensus summary is appended at the end, not inserted at the top
 6. If a position changes, explain the change in a new entry — don't edit the old one
