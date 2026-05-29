@@ -97,7 +97,7 @@ const CLI_PROFILES = {
   claude: {
     name: "Claude",
     binary: "claude",
-    defaultModel: "claude-opus-4-7",
+    defaultModel: "claude-opus-4-8",
     buildCmd: (promptFile, cwd, model) => {
       const m = validateModel(model, "claude");
       return `cd "${cwd}" && cat "${promptFile}" | claude -p --model "${m}" --effort max --output-format text --allowedTools "Read,Grep,Glob,Bash"`;
