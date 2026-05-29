@@ -7,7 +7,7 @@ A single command for structured, turn-based AI discussions. Supports three modes
 ```
 /discuss "topic" file.md                              → council mode (default): orchestrates two Claude instances debating to completion
 /discuss "topic" file.md --agents claude,codex        → council with cross-model debate (Claude vs Codex)
-/discuss "topic" file.md --models MODEL_A,MODEL_B     → pin specific model versions (e.g. claude-opus-4-8,gpt-5.4); for eval reproducibility
+/discuss "topic" file.md --models MODEL_A,MODEL_B     → pin specific model versions (e.g. claude-opus-4-8,gpt-5.5); for eval reproducibility
 /discuss "topic" file.md --mode external              → external mode: creates discussion file, waits for another AI to join manually
 /discuss file.md                                      → join mode: joins an existing discussion as a participant
 ```
@@ -216,7 +216,7 @@ Defaults: each CLI uses its built-in default (`claude-opus-4-8` for claude, `gpt
 When you need a specific version (eval reproducibility, calibration, comparing model generations), pin via `--models`:
 
 ```
-/discuss "Best 12-week training program for this client" discussion.md --agents claude,codex --models claude-opus-4-8,gpt-5.4
+/discuss "Best 12-week training program for this client" discussion.md --agents claude,codex --models claude-opus-4-8,gpt-5.5
 ```
 
 Or write `agent_a_model` / `agent_b_model` directly into existing frontmatter — the orchestrator will pin to those values on the next run.
