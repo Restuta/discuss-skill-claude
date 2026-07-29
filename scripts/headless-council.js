@@ -97,7 +97,7 @@ const CLI_PROFILES = {
   claude: {
     name: "Claude",
     binary: "claude",
-    defaultModel: "claude-opus-4-8",
+    defaultModel: "claude-opus-5",
     buildCmd: (promptFile, cwd, model) => {
       const m = validateModel(model, "claude");
       return `cd "${cwd}" && cat "${promptFile}" | claude -p --model "${m}" --effort max --output-format text --allowedTools "Read,Grep,Glob,Bash"`;
@@ -110,7 +110,7 @@ const CLI_PROFILES = {
   codex: {
     name: "Codex",
     binary: "codex",
-    defaultModel: "gpt-5.5",
+    defaultModel: "gpt-5.6-sol",
     buildCmd: (promptFile, cwd, model) => {
       const m = validateModel(model, "codex");
       return `cat "${promptFile}" | codex exec --full-auto --skip-git-repo-check -m "${m}" -c model_reasoning_effort='"xhigh"' -C "${cwd}" -`;

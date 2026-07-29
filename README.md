@@ -114,9 +114,8 @@ Optional. Council mode only. Pin specific model versions for each agent — usef
 
 | Value | What runs |
 |---|---|
-| *(omitted)* | CLI defaults: `claude-opus-4-8` for Claude, `gpt-5.5` for Codex. Resolved model is written into frontmatter. |
-| `claude-opus-4-8,gpt-5.5` | Pin Agent A = Claude Opus 4.8, Agent B = Codex with gpt-5.5 |
-| `claude-opus-4-7,gpt-5.4` | Pin to an older generation on both sides (e.g. for re-running an earlier benchmark) |
+| *(omitted)* | CLI defaults: `claude-opus-5` for Claude, `gpt-5.6-sol` for Codex. Resolved model is written into frontmatter. |
+| `claude-opus-5,gpt-5.6-sol` | Pin Agent A = Claude Opus 5, Agent B = Codex with GPT-5.6 Sol |
 
 You can also write `agent_a_model` / `agent_b_model` directly into existing frontmatter — the orchestrator will pin to those values on the next run.
 
